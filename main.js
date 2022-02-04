@@ -16,9 +16,16 @@ var app = http.createServer(function (request, response) {
   console.log(pathname);
   if (pathname === "/") {
     if (title == null) {
-      title = " Welcome!";
-      data = "I am JEE";
-      let template = `
+      fs.readdir("./data", (err, files) => {
+        title = " Welcome!";
+        data = "I am JEE";
+
+        let list = "<ul>";
+        files.forEach((elem, inx, arr) => {
+          list = list + `<li><a href="?id=${elem}">${elem}</a></li>`;
+        });
+        list = list + "</ul>";
+        let template = `
         <!doctype html>
         <html>
         <head>
@@ -27,22 +34,19 @@ var app = http.createServer(function (request, response) {
         </head>
         <body>
           <h1><a href="/">WEB</a></h1>
-          <ol>
-            <li><a href="?id=HTML">HTML</a></li>
-            <li><a href="?id=CSS">CSS</a></li>
-            <li><a href="?id=JavaScript">JavaScript</a></li>
-          </ol>
+          ${list}
           <h2>${title}</h2>
           <p>${data}</p>
         </body>
         </html>
     `;
-      //console.log(_url);
-      //console.log(__dirname + _url);
-      //response.end(fs.readFileSync(__dirname + _url));
-      //response.end(queryData.id);
-      response.writeHead(200);
-      response.end(template);
+        //console.log(_url);
+        //console.log(__dirname + _url);
+        //response.end(fs.readFileSync(__dirname + _url));
+        //response.end(queryData.id);
+        response.writeHead(200);
+        response.end(template);
+      });
     } else {
       //console.log("data/" + title);
       fs.readFile("data/" + title, "utf8", (err, data) => {
@@ -50,31 +54,34 @@ var app = http.createServer(function (request, response) {
           throw err;
         }
 
-        let template = `
-      <!doctype html>
-      <html>
-      <head>
-        <title>WEB1 - ${title}</title>
-        <meta charset="utf-8">
-      </head>
-      <body>
-        <h1><a href="/">WEB</a></h1>
-        <ol>
-          <li><a href="?id=HTML">HTML</a></li>
-          <li><a href="?id=CSS">CSS</a></li>
-          <li><a href="?id=JavaScript">JavaScript</a></li>
-        </ol>
-        <h2>${title}</h2>
-        <p>${data}</p>
-      </body>
-      </html>
-  `;
-        //console.log(_url);
-        //console.log(__dirname + _url);
-        //response.end(fs.readFileSync(__dirname + _url));
-        //response.end(queryData.id);
-        response.writeHead(200);
-        response.end(template);
+        fs.readdir("./data", (err, files) => {
+          let list = "<ul>";
+          files.forEach((elem, inx, arr) => {
+            list = list + `<li><a href="?id=${elem}">${elem}</a></li>`;
+          });
+          list = list + "</ul>";
+          let template = `
+          <!doctype html>
+          <html>
+          <head>
+            <title>WEB1 - ${title}</title>
+            <meta charset="utf-8">
+          </head>
+          <body>
+            <h1><a href="/">WEB</a></h1>
+            ${list}
+            <h2>${title}</h2>
+            <p>${data}</p>
+          </body>
+          </html>
+      `;
+          //console.log(_url);
+          //console.log(__dirname + _url);
+          //response.end(fs.readFileSync(__dirname + _url));
+          //response.end(queryData.id);
+          response.writeHead(200);
+          response.end(template);
+        });
       });
     }
   } else {
