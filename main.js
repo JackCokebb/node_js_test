@@ -12,46 +12,71 @@ var app = http.createServer(function (request, response) {
   //new way
   var title = test_url.searchParams.get("id");
   var pathname = test_url.pathname;
-  var temp = "HTML";
-  if (title == null) {
-    title = temp;
-  } else {
-    temp = title;
-  }
+
   console.log(pathname);
   if (pathname === "/") {
-    //console.log("data/" + title);
-    fs.readFile("data/" + title, "utf8", (err, data) => {
-      if (err) {
-        throw err;
-      }
-
+    if (title == null) {
+      title = " Welcome!";
+      data = "I am JEE";
       let template = `
-  <!doctype html>
-<html>
-<head>
-  <title>WEB1 - ${title}</title>
-  <meta charset="utf-8">
-</head>
-<body>
-  <h1><a href="/">WEB</a></h1>
-  <ol>
-    <li><a href="?id=HTML">HTML</a></li>
-    <li><a href="?id=CSS">CSS</a></li>
-    <li><a href="?id=JavaScript">JavaScript</a></li>
-  </ol>
-  <h2>${title}</h2>
-  <p>${data}</p>
-</body>
-</html>
-  `;
+        <!doctype html>
+        <html>
+        <head>
+          <title>WEB1 - ${title}</title>
+          <meta charset="utf-8">
+        </head>
+        <body>
+          <h1><a href="/">WEB</a></h1>
+          <ol>
+            <li><a href="?id=HTML">HTML</a></li>
+            <li><a href="?id=CSS">CSS</a></li>
+            <li><a href="?id=JavaScript">JavaScript</a></li>
+          </ol>
+          <h2>${title}</h2>
+          <p>${data}</p>
+        </body>
+        </html>
+    `;
       //console.log(_url);
       //console.log(__dirname + _url);
       //response.end(fs.readFileSync(__dirname + _url));
       //response.end(queryData.id);
       response.writeHead(200);
       response.end(template);
-    });
+    } else {
+      //console.log("data/" + title);
+      fs.readFile("data/" + title, "utf8", (err, data) => {
+        if (err) {
+          throw err;
+        }
+
+        let template = `
+      <!doctype html>
+      <html>
+      <head>
+        <title>WEB1 - ${title}</title>
+        <meta charset="utf-8">
+      </head>
+      <body>
+        <h1><a href="/">WEB</a></h1>
+        <ol>
+          <li><a href="?id=HTML">HTML</a></li>
+          <li><a href="?id=CSS">CSS</a></li>
+          <li><a href="?id=JavaScript">JavaScript</a></li>
+        </ol>
+        <h2>${title}</h2>
+        <p>${data}</p>
+      </body>
+      </html>
+  `;
+        //console.log(_url);
+        //console.log(__dirname + _url);
+        //response.end(fs.readFileSync(__dirname + _url));
+        //response.end(queryData.id);
+        response.writeHead(200);
+        response.end(template);
+      });
+    }
   } else {
     response.writeHead(404);
     response.end("Not found");
