@@ -5,32 +5,28 @@ var url = require("url");
 var app = http.createServer(function (request, response) {
   var _url = request.url;
   var test_url = new URL(_url, "http://localhost:3000/");
-
+  console.log(test_url);
   //get(parse) query string from url
   //deprecated way
   var queryData = url.parse(_url, true).query;
   //new way
   var title = test_url.searchParams.get("id");
-  let desc = "";
-  //console.log(test_url);
-  //console.log(queryData2);
-  if (_url == "/") {
-    title = "Welcome";
-    desc = "Hello! i am JEE";
+  var pathname = test_url.pathname;
+  var temp = "HTML";
+  if (title == null) {
+    title = temp;
+  } else {
+    temp = title;
   }
-  if (_url == "/favicon.ico") {
-    return response.writeHead(404);
-  }
-  response.writeHead(200);
+  console.log(pathname);
+  if (pathname === "/") {
+    //console.log("data/" + title);
+    fs.readFile("data/" + title, "utf8", (err, data) => {
+      if (err) {
+        throw err;
+      }
 
-  //console.log("data/" + title);
-  fs.readFile("data/" + title, "utf8", (err, data) => {
-    if (err) {
-      throw err;
-    }
-    desc = data;
-
-    let template = `
+      let template = `
   <!doctype html>
 <html>
 <head>
@@ -45,15 +41,20 @@ var app = http.createServer(function (request, response) {
     <li><a href="?id=JavaScript">JavaScript</a></li>
   </ol>
   <h2>${title}</h2>
-  <p>${desc}</p>
+  <p>${data}</p>
 </body>
 </html>
   `;
-    //console.log(_url);
-    //console.log(__dirname + _url);
-    //response.end(fs.readFileSync(__dirname + _url));
-    //response.end(queryData.id);
-    response.end(template);
-  });
+      //console.log(_url);
+      //console.log(__dirname + _url);
+      //response.end(fs.readFileSync(__dirname + _url));
+      //response.end(queryData.id);
+      response.writeHead(200);
+      response.end(template);
+    });
+  } else {
+    response.writeHead(404);
+    response.end("Not found");
+  }
 });
 app.listen(3000);
