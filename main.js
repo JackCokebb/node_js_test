@@ -101,21 +101,29 @@ var app = http.createServer(function (request, response) {
       response.end(template);
     });
   } else if (pathname === "/create_process") {
-    //fs.writeFile('data/$_POST["title"]', $_POST["description"], "utf8", err);
     let body = "";
 
     //request.on() - https://nodejs.org/ko/docs/guides/anatomy-of-an-http-transaction/
     request.on("data", function (data) {
       body = body + data;
-      if (body.length > 1e6)
+      if (body.length > 1e6) {
         //destroy connection if data is too much
-        request.connection.destroy();
+        //request.connection.destroy();
+      }
     });
     //when there is no more data
     request.on("end", function () {
       //let post = qs.parse(body);
       let title = new URLSearchParams(body).get("title");
       let desc = new URLSearchParams(body).get("description");
+      fs.writeFile(`data/${title}`, desc, "utf8", (err) => {
+        if (err) throw err;
+        console.log(`create file '${title}' successfully`);
+        response.writeHead(302, {
+          Location: `http://localhost:3000/?id=${title}`,
+        });
+        response.end();
+      });
     });
   } else {
     response.writeHead(404);
