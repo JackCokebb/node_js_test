@@ -3,7 +3,7 @@ var fs = require("fs");
 var url = require("url");
 var qs = require("querystring");
 
-function templateHTML(title, list, body) {
+function templateHTML(title, list, body, control) {
   return `
   <!doctype html>
   <html>
@@ -14,7 +14,7 @@ function templateHTML(title, list, body) {
   <body>
     <h1><a href="/">WEB</a></h1>
     ${list}
-    <a href="/create">create</a>
+    ${control}
     ${body}
   </body>
   </html>
@@ -49,7 +49,12 @@ var app = http.createServer(function (request, response) {
         data = "I am JEE";
 
         let list = print_list(files);
-        let template = templateHTML(title, list, `<h2>${title}</h2>${data}`);
+        let template = templateHTML(
+          title,
+          list,
+          `<h2>${title}</h2>${data}`,
+          `<a href="/create">create</a>`
+        );
         //console.log(_url);
         //console.log(__dirname + _url);
         //response.end(fs.readFileSync(__dirname + _url));
@@ -66,7 +71,12 @@ var app = http.createServer(function (request, response) {
 
         fs.readdir("./data", (err, files) => {
           let list = print_list(files);
-          let template = templateHTML(title, list, `<h2>${title}</h2>${data}`);
+          let template = templateHTML(
+            title,
+            list,
+            `<h2>${title}</h2>${data}`,
+            `<a href="/create">create</a> <a href="/update?id=${title}">update</a>`
+          );
           //console.log(_url);
           //console.log(__dirname + _url);
           //response.end(fs.readFileSync(__dirname + _url));
@@ -91,7 +101,8 @@ var app = http.createServer(function (request, response) {
         <p><textarea name ='description' placeholder="description"></textarea></p>
         <p><input type='submit'></p>
       </form>
-      `
+      `,
+        ""
       );
       //console.log(_url);
       //console.log(__dirname + _url);
