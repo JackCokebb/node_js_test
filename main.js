@@ -163,6 +163,37 @@ var app = http.createServer(function (request, response) {
         response.end(template);
       });
     });
+  } else if (pathname === "/update_process") {
+    let body = "";
+
+    //request.on() - https://nodejs.org/ko/docs/guides/anatomy-of-an-http-transaction/
+    request.on("data", function (data) {
+      body = body + data;
+      if (body.length > 1e6) {
+        //destroy connection if data is too much
+        //request.connection.destroy();
+      }
+    });
+    //when there is no more data
+    request.on("end", function () {
+      //let post = qs.parse(body);
+      let id = new URLSearchParams(body).get("id");
+      let title = new URLSearchParams(body).get("title");
+      let desc = new URLSearchParams(body).get("description");
+      fs.rename(`data/${id}`, `data/${title}`, (err) => {
+        if (err) {
+          console.log(err);
+        }
+      });
+      fs.writeFile(`data/${title}`, desc, "utf8", (err) => {
+        if (err) throw err;
+        console.log(`update file '${title}' successfully`);
+        response.writeHead(302, {
+          Location: `http://localhost:3000/?id=${title}`,
+        });
+        response.end();
+      });
+    });
   } else {
     response.writeHead(404);
     response.end("Not found");
