@@ -75,7 +75,15 @@ var app = http.createServer(function (request, response) {
             title,
             list,
             `<h2>${title}</h2>${data}`,
-            `<a href="/create">create</a> <a href="/update?id=${title}">update</a>`
+            `<a href="/create">create</a> 
+            <a href="/update?id=${title}">update</a>
+            <form action="/delete_process" method="post">
+              <input type='hidden' name="id" value=${title}>
+              <input type="submit" value="delete">
+            </form>
+            `
+            //you can add onsubmit property in form tag
+            //to re-check if user really want to delete the content.
           );
           //console.log(_url);
           //console.log(__dirname + _url);
@@ -193,6 +201,29 @@ var app = http.createServer(function (request, response) {
         });
         response.end();
       });
+    });
+  } else if (pathname === "/delete_process") {
+    let body = "";
+    request.on("data", function (data) {
+      body = body + data;
+      if (body.length > 1e6) {
+        //destroy connection if data is too much
+        //request.connection.destroy();
+      }
+    });
+    //when there is no more data
+    request.on("end", function () {
+      //let post = qs.parse(body);
+      let id = new URLSearchParams(body).get("id");
+      fs.unlink(`data/${id}`, (err) => {
+        if (err) {
+          console.log(err);
+        }
+      });
+      response.writeHead(302, {
+        Location: `/`,
+      });
+      response.end();
     });
   } else {
     response.writeHead(404);
