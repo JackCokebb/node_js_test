@@ -136,6 +136,33 @@ var app = http.createServer(function (request, response) {
         response.end();
       });
     });
+  } else if (pathname === "/update") {
+    fs.readFile("data/" + title, "utf8", (err, data) => {
+      if (err) {
+        throw err;
+      }
+
+      fs.readdir("./data", (err, files) => {
+        let list = print_list(files);
+        let template = templateHTML(
+          title,
+          list,
+          `<form action="/update_process" method="post">
+            <input type="hidden" name="id" value="${title}">
+            <p><input type="text" name="title" placeholder="title" value="${title}" ></p>
+            <p><textarea name="description" placeholder="description">${data}</textarea></p>
+            <p><input type="submit"></p>
+          </form>`,
+          `<a href="/create">create</a> <a href="/update?id=${title}">update</a>`
+        );
+        //console.log(_url);
+        //console.log(__dirname + _url);
+        //response.end(fs.readFileSync(__dirname + _url));
+        //response.end(queryData.id);
+        response.writeHead(200);
+        response.end(template);
+      });
+    });
   } else {
     response.writeHead(404);
     response.end("Not found");
