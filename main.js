@@ -1,33 +1,35 @@
-var http = require("http");
-var fs = require("fs");
-var url = require("url");
-var qs = require("querystring");
+const http = require("http");
+const fs = require("fs");
+const url = require("url");
+const qs = require("querystring");
 
-function templateHTML(title, list, body, control) {
-  return `
-  <!doctype html>
-  <html>
-  <head>
-    <title>WEB1 - ${title}</title>
-    <meta charset="utf-8">
-  </head>
-  <body>
-    <h1><a href="/">WEB</a></h1>
-    ${list}
-    ${control}
-    ${body}
-  </body>
-  </html>
-`;
-}
-function print_list(files) {
-  let list = "<ul>";
-  files.forEach((elem, inx, arr) => {
-    list = list + `<li><a href="?id=${elem}">${elem}</a></li>`;
-  });
-  list = list + "</ul>";
-  return list;
-}
+const template = {
+  html: function (title, list, body, control) {
+    return `
+    <!doctype html>
+    <html>
+    <head>
+      <title>WEB1 - ${title}</title>
+      <meta charset="utf-8">
+    </head>
+    <body>
+      <h1><a href="/">WEB</a></h1>
+      ${list}
+      ${control}
+      ${body}
+    </body>
+    </html>
+  `;
+  },
+  list: function (files) {
+    let list = "<ul>";
+    files.forEach((elem, inx, arr) => {
+      list = list + `<li><a href="?id=${elem}">${elem}</a></li>`;
+    });
+    list = list + "</ul>";
+    return list;
+  },
+};
 
 var app = http.createServer(function (request, response) {
   var _url = request.url;
@@ -48,8 +50,15 @@ var app = http.createServer(function (request, response) {
         title = " Welcome!";
         data = "I am JEE";
 
-        let list = print_list(files);
-        let template = templateHTML(
+        // let list = print_list(files);
+        // let template = templateHTML(
+        //   title,
+        //   list,
+        //   `<h2>${title}</h2>${data}`,
+        //   `<a href="/create">create</a>`
+        // );
+        let list = template.list(files);
+        let html = template.html(
           title,
           list,
           `<h2>${title}</h2>${data}`,
@@ -60,7 +69,7 @@ var app = http.createServer(function (request, response) {
         //response.end(fs.readFileSync(__dirname + _url));
         //response.end(queryData.id);
         response.writeHead(200);
-        response.end(template);
+        response.end(html);
       });
     } else {
       //console.log("data/" + title);
@@ -70,8 +79,8 @@ var app = http.createServer(function (request, response) {
         }
 
         fs.readdir("./data", (err, files) => {
-          let list = print_list(files);
-          let template = templateHTML(
+          let list = template.list(files);
+          let html = template.html(
             title,
             list,
             `<h2>${title}</h2>${data}`,
@@ -90,7 +99,7 @@ var app = http.createServer(function (request, response) {
           //response.end(fs.readFileSync(__dirname + _url));
           //response.end(queryData.id);
           response.writeHead(200);
-          response.end(template);
+          response.end(html);
         });
       });
     }
@@ -98,8 +107,8 @@ var app = http.createServer(function (request, response) {
     fs.readdir("./data", (err, files) => {
       title = " Create a new content";
 
-      let list = print_list(files);
-      let template = templateHTML(
+      let list = template.list(files);
+      let html = template.html(
         title,
         list,
         `
@@ -117,7 +126,7 @@ var app = http.createServer(function (request, response) {
       //response.end(fs.readFileSync(__dirname + _url));
       //response.end(queryData.id);
       response.writeHead(200);
-      response.end(template);
+      response.end(html);
     });
   } else if (pathname === "/create_process") {
     let body = "";
@@ -151,8 +160,8 @@ var app = http.createServer(function (request, response) {
       }
 
       fs.readdir("./data", (err, files) => {
-        let list = print_list(files);
-        let template = templateHTML(
+        let list = template.list(files);
+        let html = template.html(
           title,
           list,
           `<form action="/update_process" method="post">
@@ -168,7 +177,7 @@ var app = http.createServer(function (request, response) {
         //response.end(fs.readFileSync(__dirname + _url));
         //response.end(queryData.id);
         response.writeHead(200);
-        response.end(template);
+        response.end(html);
       });
     });
   } else if (pathname === "/update_process") {
