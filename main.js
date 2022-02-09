@@ -2,6 +2,7 @@ const http = require("http");
 const fs = require("fs");
 const url = require("url");
 const qs = require("querystring");
+const path = require("path");
 
 //refactoring
 const template = require("./lib/template.js");
@@ -48,7 +49,9 @@ var app = http.createServer(function (request, response) {
       });
     } else {
       //console.log("data/" + title);
-      fs.readFile("data/" + title, "utf8", (err, data) => {
+      const filteredPath = path.parse(title).base;
+      console.log("filtered: " + filteredPath);
+      fs.readFile("data/" + filteredPath, "utf8", (err, data) => {
         if (err) {
           throw err;
         }
@@ -119,6 +122,7 @@ var app = http.createServer(function (request, response) {
       //let post = qs.parse(body);
       let title = new URLSearchParams(body).get("title");
       let desc = new URLSearchParams(body).get("description");
+      const filteredPath = path.parse(title).base;
       fs.writeFile(`data/${title}`, desc, "utf8", (err) => {
         if (err) throw err;
         console.log(`create file '${title}' successfully`);
@@ -172,7 +176,7 @@ var app = http.createServer(function (request, response) {
       let id = new URLSearchParams(body).get("id");
       let title = new URLSearchParams(body).get("title");
       let desc = new URLSearchParams(body).get("description");
-      fs.rename(`data/${id}`, `data/${title}`, (err) => {
+      fs.rename(`data/${id}`, `data/${filteredPath}`, (err) => {
         if (err) {
           console.log(err);
         }
@@ -199,7 +203,8 @@ var app = http.createServer(function (request, response) {
     request.on("end", function () {
       //let post = qs.parse(body);
       let id = new URLSearchParams(body).get("id");
-      fs.unlink(`data/${id}`, (err) => {
+      const filteredPath = path.parse(id).base;
+      fs.unlink(`data/${filteredPath}`, (err) => {
         if (err) {
           console.log(err);
         }
