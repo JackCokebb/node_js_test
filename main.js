@@ -3,6 +3,7 @@ const fs = require("fs");
 const url = require("url");
 const qs = require("querystring");
 
+//refactoring
 const template = {
   html: function (title, list, body, control) {
     return `
