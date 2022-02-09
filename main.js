@@ -3,6 +3,7 @@ const fs = require("fs");
 const url = require("url");
 const qs = require("querystring");
 const path = require("path");
+const sanitizeHtml = require("sanitize-html");
 
 //refactoring
 const template = require("./lib/template.js");
@@ -57,15 +58,19 @@ var app = http.createServer(function (request, response) {
         }
 
         fs.readdir("./data", (err, files) => {
+          let sanitizedTitle = sanitizeHtml(title);
+          let sanitizedData = sanitizeHtml(data, {
+            allowedTags: ["h1", "h2"],
+          });
           let list = template.list(files);
           let html = template.html(
             title,
             list,
-            `<h2>${title}</h2>${data}`,
+            `<h2>${sanitizedTitle}</h2>${sanitizedData}`,
             `<a href="/create">create</a> 
-            <a href="/update?id=${title}">update</a>
+            <a href="/update?id=${sanitizedTitle}">update</a>
             <form action="/delete_process" method="post">
-              <input type='hidden' name="id" value=${title}>
+              <input type='hidden' name="id" value=${sanitizedTitle}>
               <input type="submit" value="delete">
             </form>
             `
@@ -176,7 +181,7 @@ var app = http.createServer(function (request, response) {
       let id = new URLSearchParams(body).get("id");
       let title = new URLSearchParams(body).get("title");
       let desc = new URLSearchParams(body).get("description");
-      fs.rename(`data/${id}`, `data/${filteredPath}`, (err) => {
+      fs.rename(`data/${id}`, `data/${title}`, (err) => {
         if (err) {
           console.log(err);
         }
